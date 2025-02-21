@@ -40,6 +40,11 @@ const navigation = [
     href: "/admin/dashboard/testimonials",
     icon: MessageSquare,
   },
+  {
+    title: "Events",
+    href: "/admin/dashboard/events",
+    icon: MessageSquare,
+  },
   // {
   //   title: "Settings",
   //   href: "/admin/dashboard/settings",
