@@ -22,6 +22,10 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
 }
 
 export default nextConfig
