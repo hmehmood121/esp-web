@@ -1,13 +1,16 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Images, Users, MessageSquare, Settings, LogOut, Menu } from "lucide-react"
+import { LayoutDashboard, Images, Users, MessageSquare, LogOut, Menu, Camera } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useToast } from "@/components/ui/use-toast"
 import {
   Sidebar,
   SidebarHeader,
@@ -29,6 +32,11 @@ const navigation = [
     title: "Gallery",
     href: "/admin/dashboard/gallery",
     icon: Images,
+  },
+  {
+    title: "Photography",
+    href: "/admin/dashboard/photography",
+    icon: Camera,
   },
   {
     title: "Team",
@@ -54,16 +62,31 @@ const navigation = [
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const { toast } = useToast()
 
   const handleLogout = async () => {
     try {
       const auth = getAuth()
       await signOut(auth)
       localStorage.removeItem("isAdminLoggedIn")
+
+      toast({
+        variant: "success",
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      })
+
       window.location.href = "/admin"
     } catch (error) {
       console.error("Error signing out:", error)
+
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+      })
     }
   }
 

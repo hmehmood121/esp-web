@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/components/ui/use-toast"
 
 import { getStorage } from "firebase/storage"
 
@@ -19,6 +20,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState([])
   const [isUploading, setIsUploading] = useState(false)
   const [editEvent, setEditEvent] = useState(null)
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -43,7 +45,11 @@ export default function EventsPage() {
       setEvents(eventsData)
     } catch (error) {
       console.error("Error fetching events:", error)
-      alert("Error fetching events")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch events. Please try again.",
+      })
     }
   }
 
@@ -87,17 +93,29 @@ export default function EventsPage() {
 
       if (editEvent) {
         await updateDoc(doc(db, "events", editEvent.id), eventData)
-        alert("Event updated successfully")
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Event updated successfully",
+        })
       } else {
         await addDoc(collection(db, "events"), eventData)
-        alert("Event added successfully")
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Event added successfully",
+        })
       }
 
       resetForm()
       fetchEvents()
     } catch (error) {
       console.error("Error saving event:", error)
-      alert("Error saving event")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save event. Please try again.",
+      })
     } finally {
       setIsUploading(false)
     }
@@ -129,11 +147,19 @@ export default function EventsPage() {
         await deleteObject(imageRef).catch((error) => console.error("Error deleting image:", error))
       }
 
-      alert("Event deleted successfully")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Event deleted successfully",
+      })
       fetchEvents()
     } catch (error) {
       console.error("Error deleting event:", error)
-      alert("Error deleting event")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete event. Please try again.",
+      })
     }
   }
 

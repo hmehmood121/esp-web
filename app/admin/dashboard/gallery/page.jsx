@@ -5,6 +5,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import { addDoc, collection, getDocs, deleteDoc, doc } from "firebase/firestore"
 import { Loader2, Upload, Video, Trash2 } from "lucide-react"
 import { db } from "@/firebase"
+import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,6 +30,7 @@ export default function GalleryUpload() {
   const [previewUrls, setPreviewUrls] = useState([])
   const [galleryImages, setGalleryImages] = useState({})
   const [galleryVideos, setGalleryVideos] = useState([])
+  const { toast } = useToast()
 
   // Fetch existing images and videos on component mount
   useEffect(() => {
@@ -63,6 +65,11 @@ export default function GalleryUpload() {
       setGalleryVideos(videosData)
     } catch (error) {
       console.error("Error fetching gallery items:", error)
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch gallery items. Please try again.",
+      })
     }
   }
 
@@ -82,7 +89,11 @@ export default function GalleryUpload() {
     setIsUploading(true)
 
     if (!category || images.length === 0) {
-      alert("Please enter a category name and select images")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a category name and select images",
+      })
       setIsUploading(false)
       return
     }
@@ -105,14 +116,22 @@ export default function GalleryUpload() {
         })
       }
 
-      alert("Images uploaded successfully!")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Images uploaded successfully!",
+      })
       setCategory("")
       setImages([])
       setPreviewUrls([])
       fetchGalleryItems()
     } catch (error) {
       console.error("Error uploading images:", error)
-      alert("Error uploading images. Please try again.")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error uploading images. Please try again.",
+      })
     } finally {
       setIsUploading(false)
     }
@@ -127,12 +146,20 @@ export default function GalleryUpload() {
         portfolio: videoUrl,
         timestamp: new Date().toISOString(),
       })
-      alert("Video link added successfully")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Video link added successfully",
+      })
       setVideoUrl("")
       fetchGalleryItems()
     } catch (error) {
       console.error("Error adding video:", error)
-      alert("Error adding video")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error adding video. Please try again.",
+      })
     } finally {
       setIsUploading(false)
     }
@@ -148,22 +175,38 @@ export default function GalleryUpload() {
       const imageRef = ref(storage, storagePath)
       await deleteObject(imageRef)
 
-      alert("Image deleted successfully")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Image deleted successfully",
+      })
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting image:", error)
-      alert("Error deleting image")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error deleting image. Please try again.",
+      })
     }
   }
 
   const deleteVideo = async (videoId) => {
     try {
       await deleteDoc(doc(db, "portfolio", videoId))
-      alert("Video link deleted successfully")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Video link deleted successfully",
+      })
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting video:", error)
-      alert("Error deleting video")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error deleting video. Please try again.",
+      })
     }
   }
 

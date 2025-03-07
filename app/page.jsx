@@ -5,14 +5,13 @@ import Link from "next/link"
 import { Menu, Star, Quote, CheckCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 import { db } from "@/firebase" // Adjust path based on your setup
 import { collection, getDocs } from "firebase/firestore"
+import { ContactForm } from "@/components/contact-form"
 
 function MobileNav() {
   const [open, setOpen] = useState(false)
@@ -563,15 +562,9 @@ export default function Home() {
         <section id="contact" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container px-4 md:px-6 max-w-screen-xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">Contact Us</h2>
-            <form className="max-w-md mx-auto space-y-4">
-              <Input type="text" placeholder="Name" />
-              <Input type="email" placeholder="Email" />
-              <Input type="tel" placeholder="Phone" />
-              <Textarea placeholder="Message" className="min-h-[120px]" />
-              <Button type="submit" className="w-full">
-                Send Message
-              </Button>
-            </form>
+            <div className="max-w-md mx-auto">
+              <ContactForm />
+            </div>
           </div>
         </section>
       </main>

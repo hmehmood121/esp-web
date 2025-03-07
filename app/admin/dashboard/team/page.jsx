@@ -5,6 +5,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { Loader2, Upload, Pencil, Trash2, X } from "lucide-react"
 import { db } from "@/firebase"
+import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +17,7 @@ export default function TeamPage() {
   const [members, setMembers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [editMember, setEditMember] = useState(null)
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -38,7 +40,11 @@ export default function TeamPage() {
       setMembers(teamData)
     } catch (error) {
       console.error("Error fetching team members:", error)
-      alert("Error fetching team members")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch team members. Please try again.",
+      })
     }
   }
 
@@ -79,6 +85,11 @@ export default function TeamPage() {
           about: formData.about,
           imageUrl: imageUrl,
         })
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Team member updated successfully!",
+        })
       } else {
         // Add new member
         await addDoc(collection(db, "team"), {
@@ -88,14 +99,22 @@ export default function TeamPage() {
           imageUrl: imageUrl,
           timestamp: new Date().toISOString(),
         })
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Team member added successfully!",
+        })
       }
 
-      alert(editMember ? "Member updated successfully!" : "Member added successfully!")
       resetForm()
       fetchTeamMembers()
     } catch (error) {
       console.error("Error saving team member:", error)
-      alert("Error saving team member")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save team member. Please try again.",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -125,11 +144,19 @@ export default function TeamPage() {
         await deleteObject(imageRef).catch((error) => console.error("Error deleting image:", error))
       }
 
-      alert("Team member deleted successfully")
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Team member deleted successfully",
+      })
       fetchTeamMembers()
     } catch (error) {
       console.error("Error deleting team member:", error)
-      alert("Error deleting team member")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete team member. Please try again.",
+      })
     }
   }
 
