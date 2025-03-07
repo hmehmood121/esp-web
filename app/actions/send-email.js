@@ -23,9 +23,9 @@ export async function sendContactEmail(formData) {
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>", // Use your verified domain in production
-      to: "hmehmood121@gmail.com",
-      subject: `New Contact Form Submission from ${name}`,
+      from: "Contact Form ESP <onboarding@resend.dev>", // Use your verified domain in production
+      to: "ernell_sextius@hotmail.com",
+      subject: `New ESP Contact Form Submission from ${name}`,
       html: `
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
