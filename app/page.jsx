@@ -124,7 +124,7 @@ export default function Home() {
       contactSection.scrollIntoView({ behavior: "smooth" });
     }
   };
-  
+
   return (
     <div className="flex flex-col min-h-screen max-w-screen-2xl mx-auto" style={scrollStyle}>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -285,7 +285,7 @@ export default function Home() {
                 <div className="mt-6">
                   <p className="text-gray-500 dark:text-gray-400">
                     Ernell Sextius is a visionary leader with over 15 years of experience in the multimedia industry. He
-                    founded MultiMedia Co. with the goal of bridging the gap between cutting-edge technology and
+                    founded ESproductionz Co. with the goal of bridging the gap between cutting-edge technology and
                     creative expression. Under her guidance, our company has grown to become a leading force in
                     photography, videography, audio production, and digital development.
                   </p>
