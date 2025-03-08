@@ -25,6 +25,8 @@ function MobileNav() {
     }
   }
 
+
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -115,6 +117,14 @@ export default function Home() {
 
     fetchVideos()
   }, [])
+
+  const handleScroll = () => {
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  
   return (
     <div className="flex flex-col min-h-screen max-w-screen-2xl mx-auto" style={scrollStyle}>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -168,11 +178,11 @@ export default function Home() {
                   Bringing Your Vision to Life
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                  We specialize in photography, videography, audio production, web and mobile app development.
+                  We specialize in Photography, Videography, audio production, Web and Mobile app development.
                 </p>
               </div>
               <div className="space-x-4 pt-4">
-                <Button>Get Started</Button>
+                <Button onClick={handleScroll}>Get Started</Button>
               </div>
             </div>
           </div>
