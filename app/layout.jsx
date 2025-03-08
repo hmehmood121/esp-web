@@ -1,5 +1,5 @@
 import "./globals.css"
-import { Toaster } from "@/components/toaster"
+import { Toaster } from "sonner"
 
 export const metadata = {
   title: "Esproductionz",
@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         {children}
-        <Toaster />
+        <Toaster position='top-center' />
       </body>
     </html>
   )

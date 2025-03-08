@@ -5,7 +5,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import { addDoc, collection, getDocs, deleteDoc, doc } from "firebase/firestore"
 import { Loader2, Upload, Video, Trash2 } from "lucide-react"
 import { db } from "@/firebase"
-import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { toast } from "sonner"
 
 export default function GalleryUpload() {
   const [category, setCategory] = useState("")
@@ -30,7 +30,7 @@ export default function GalleryUpload() {
   const [previewUrls, setPreviewUrls] = useState([])
   const [galleryImages, setGalleryImages] = useState({})
   const [galleryVideos, setGalleryVideos] = useState([])
-  const { toast } = useToast()
+
 
   // Fetch existing images and videos on component mount
   useEffect(() => {
@@ -65,11 +65,7 @@ export default function GalleryUpload() {
       setGalleryVideos(videosData)
     } catch (error) {
       console.error("Error fetching gallery items:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch gallery items. Please try again.",
-      })
+      toast.error("Failed to fetch gallery items. Please try again.")
     }
   }
 
@@ -89,11 +85,7 @@ export default function GalleryUpload() {
     setIsUploading(true)
 
     if (!category || images.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a category name and select images",
-      })
+      toast.error("Please enter a category name and select images")
       setIsUploading(false)
       return
     }
@@ -116,22 +108,14 @@ export default function GalleryUpload() {
         })
       }
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Images uploaded successfully!",
-      })
+      toast.success("Images uploaded successfully!")
       setCategory("")
       setImages([])
       setPreviewUrls([])
       fetchGalleryItems()
     } catch (error) {
       console.error("Error uploading images:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error uploading images. Please try again.",
-      })
+      toast.error("Error uploading images. Please try again.")
     } finally {
       setIsUploading(false)
     }
@@ -146,20 +130,12 @@ export default function GalleryUpload() {
         portfolio: videoUrl,
         timestamp: new Date().toISOString(),
       })
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Video link added successfully",
-      })
+      toast.success("Video link added successfully")
       setVideoUrl("")
       fetchGalleryItems()
     } catch (error) {
       console.error("Error adding video:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error adding video. Please try again.",
-      })
+      toast.error("Error adding video. Please try again.")
     } finally {
       setIsUploading(false)
     }
@@ -175,38 +151,22 @@ export default function GalleryUpload() {
       const imageRef = ref(storage, storagePath)
       await deleteObject(imageRef)
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Image deleted successfully",
-      })
+      toast.success( "Image deleted successfully")
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting image:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error deleting image. Please try again.",
-      })
+      toast.error( "Error deleting image. Please try again.",)
     }
   }
 
   const deleteVideo = async (videoId) => {
     try {
       await deleteDoc(doc(db, "portfolio", videoId))
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Video link deleted successfully",
-      })
+      toast.success("Video link deleted successfully")
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting video:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error deleting video. Please try again.",
-      })
+      toast.error( "Error deleting video. Please try again.")
     }
   }
 

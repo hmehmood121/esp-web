@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
+
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { toast } from "sonner"
 
 export default function PhotographyPage() {
   const [images, setImages] = useState([])
@@ -27,7 +28,7 @@ export default function PhotographyPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrls, setPreviewUrls] = useState([])
   const [galleryImages, setGalleryImages] = useState([])
-  const { toast } = useToast()
+
 
   // Fetch existing images on component mount
   useEffect(() => {
@@ -45,11 +46,7 @@ export default function PhotographyPage() {
       setGalleryImages(imagesData)
     } catch (error) {
       console.error("Error fetching gallery images:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch images. Please try again.",
-      })
+      toast.error("Failed to fetch images. Please try again.")
     }
   }
 
@@ -65,11 +62,7 @@ export default function PhotographyPage() {
     setIsUploading(true)
 
     if (selectedFiles.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select at least one image to upload",
-      })
+      toast.error("Please select at least one image to upload")
       setIsUploading(false)
       return
     }
@@ -100,22 +93,14 @@ export default function PhotographyPage() {
 
       await Promise.all(uploadPromises)
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: `${selectedFiles.length} images uploaded successfully!`,
-      })
+      toast.success(`${selectedFiles.length} images uploaded successfully!`)
 
       setSelectedFiles([])
       setPreviewUrls([])
       fetchGalleryImages()
     } catch (error) {
       console.error("Error uploading images:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to upload images. Please try again.",
-      })
+      toast.error("Failed to upload images. Please try again.")
     } finally {
       setIsUploading(false)
     }
@@ -131,20 +116,12 @@ export default function PhotographyPage() {
       const imageRef = ref(storage, storagePath)
       await deleteObject(imageRef)
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Image deleted successfully",
-      })
+      toast.success( "Image deleted successfully")
 
       fetchGalleryImages()
     } catch (error) {
       console.error("Error deleting image:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete image. Please try again.",
-      })
+      toast.error("Failed to delete image. Please try again.")
     }
   }
 

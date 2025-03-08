@@ -10,7 +10,7 @@ import { getAuth, signOut } from "firebase/auth"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
   Sidebar,
   SidebarHeader,
@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { toast } = useToast()
+  
 
   const handleLogout = async () => {
     try {
@@ -72,11 +72,7 @@ export default function DashboardLayout({ children }) {
       await signOut(auth)
       localStorage.removeItem("isAdminLoggedIn")
 
-      toast({
-        variant: "success",
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      })
+      toast.success("You have been successfully logged out.")
 
       window.location.href = "/admin"
     } catch (error) {

@@ -12,15 +12,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
+
 
 import { getStorage } from "firebase/storage"
+import { toast } from "sonner"
 
 export default function EventsPage() {
   const [events, setEvents] = useState([])
   const [isUploading, setIsUploading] = useState(false)
   const [editEvent, setEditEvent] = useState(null)
-  const { toast } = useToast()
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -93,29 +94,17 @@ export default function EventsPage() {
 
       if (editEvent) {
         await updateDoc(doc(db, "events", editEvent.id), eventData)
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Event updated successfully",
-        })
+        toast.success("Event updated successfully")
       } else {
         await addDoc(collection(db, "events"), eventData)
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Event added successfully",
-        })
+        toast.success("Event added successfully")
       }
 
       resetForm()
       fetchEvents()
     } catch (error) {
       console.error("Error saving event:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save event. Please try again.",
-      })
+      toast.error("Failed to save event. Please try again.")
     } finally {
       setIsUploading(false)
     }
@@ -147,19 +136,11 @@ export default function EventsPage() {
         await deleteObject(imageRef).catch((error) => console.error("Error deleting image:", error))
       }
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Event deleted successfully",
-      })
+      toast.success("Event deleted successfully")
       fetchEvents()
     } catch (error) {
       console.error("Error deleting event:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete event. Please try again.",
-      })
+      toast.error("Failed to delete event. Please try again.")
     }
   }
 

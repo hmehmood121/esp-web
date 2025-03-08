@@ -5,19 +5,19 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { Loader2, Upload, Pencil, Trash2, X, Quote } from "lucide-react"
 import { db } from "@/firebase"
-import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { toast } from "sonner"
 
 export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [editTestimonial, setEditTestimonial] = useState(null)
-  const { toast } = useToast()
+
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -40,11 +40,7 @@ export default function TestimonialsPage() {
       setTestimonials(testimonialsData)
     } catch (error) {
       console.error("Error fetching testimonials:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch testimonials. Please try again.",
-      })
+      toast.error( "Failed to fetch testimonials. Please try again.")
     }
   }
 
@@ -85,11 +81,7 @@ export default function TestimonialsPage() {
           review: formData.review,
           imageUrl: imageUrl,
         })
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Testimonial updated successfully!",
-        })
+        toast.success("Testimonial updated successfully!")
       } else {
         // Add new testimonial
         await addDoc(collection(db, "testimonials"), {
@@ -99,22 +91,14 @@ export default function TestimonialsPage() {
           imageUrl: imageUrl,
           timestamp: new Date().toISOString(),
         })
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Testimonial added successfully!",
-        })
+        toast.success( "Testimonial added successfully!")
       }
 
       resetForm()
       fetchTestimonials()
     } catch (error) {
       console.error("Error saving testimonial:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save testimonial. Please try again.",
-      })
+      toast.error("Failed to save testimonial. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -144,19 +128,11 @@ export default function TestimonialsPage() {
         await deleteObject(imageRef).catch((error) => console.error("Error deleting image:", error))
       }
 
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Testimonial deleted successfully",
-      })
+      toast.success("Testimonial deleted successfully")
       fetchTestimonials()
     } catch (error) {
       console.error("Error deleting testimonial:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete testimonial. Please try again.",
-      })
+      toast.error("Failed to delete testimonial. Please try again.")
     }
   }
 
