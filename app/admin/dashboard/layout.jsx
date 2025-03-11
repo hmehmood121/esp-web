@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Images, Users, MessageSquare, LogOut, Menu, Camera, Calendar1  } from "lucide-react"
+import { LayoutDashboard, Images, Users, MessageSquare, LogOut, Menu, Camera, Calendar1, Bell  } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 
 import { Button } from "@/components/ui/button"
@@ -52,6 +52,11 @@ const navigation = [
     title: "Events",
     href: "/admin/dashboard/events",
     icon: Calendar1,
+  },
+  {
+    title: "Notifications",
+    href: "/admin/dashboard/notifications",
+    icon: Bell,
   },
   // {
   //   title: "Settings",
