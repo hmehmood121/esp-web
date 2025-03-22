@@ -1,16 +1,15 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Images, Users, MessageSquare, LogOut, Menu, Camera, Calendar1, Bell  } from "lucide-react"
+import { LayoutDashboard, Images, Users, MessageSquare, LogOut, Menu, Camera, Bell, Briefcase } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { toast } from "sonner"
+import { useToast } from "@/components/ui/use-toast"
 import {
   Sidebar,
   SidebarHeader,
@@ -51,12 +50,17 @@ const navigation = [
   {
     title: "Events",
     href: "/admin/dashboard/events",
-    icon: Calendar1,
+    icon: MessageSquare,
   },
   {
     title: "Notifications",
     href: "/admin/dashboard/notifications",
     icon: Bell,
+  },
+  {
+    title: "Partners",
+    href: "/admin/dashboard/partners",
+    icon: Briefcase,
   },
   // {
   //   title: "Settings",
@@ -69,7 +73,7 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  
+  const { toast } = useToast()
 
   const handleLogout = async () => {
     try {
@@ -77,7 +81,11 @@ export default function DashboardLayout({ children }) {
       await signOut(auth)
       localStorage.removeItem("isAdminLoggedIn")
 
-      toast.success("You have been successfully logged out.")
+      toast({
+        variant: "success",
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      })
 
       window.location.href = "/admin"
     } catch (error) {
@@ -140,12 +148,12 @@ export default function DashboardLayout({ children }) {
             <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
-                    <Link href={item.href}>
+                  <Link href={item.href} className="w-full">
+                    <SidebarMenuButton isActive={pathname === item.href}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
