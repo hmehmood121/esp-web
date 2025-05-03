@@ -132,7 +132,7 @@ export default function Home() {
           <div className="mr-4 hidden md:flex">
             <a className="mr-6 flex items-center space-x-4" href="/">
               <Image className="ml-2" src="/eslogo.png" alt="Logo" width={32} height={32} />
-              <span className="hidden font-bold sm:inline-block">ESproductionz Co.</span>
+              <span className="hidden font-bold sm:inline-block">ESproductionz Inc.</span>
             </a>
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <a href="#services" onClick={(e) => scrollToSection(e, "services")}>
