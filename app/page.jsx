@@ -93,12 +93,6 @@ export default function Home() {
       section.scrollIntoView({ behavior: "smooth" })
     }
   }
-  const photographyImages = [
-    "https://i.ytimg.com/vi/iFTkqwnMWzU/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBuAs-QqklxZhErgS7ahlKyOG3JuQ",
-    "https://www.travelandleisure.com/thmb/gonuRZ7u4e_gzqgXN3EWDcNaOnY=/654x434/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-st-lucia-lead-image-STLUCIA1024-cab707044fad44afb8d85fec352f4a50.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFaEhXQo0MXC5VfMAJqYrCBj5SIqojJruxog&s",
-    "https://whereintheworldisnina.com/wp-content/uploads/2023/11/sugar-beach.jpg",
-  ]
 
   const [videos, setVideos] = useState([])
 
@@ -356,10 +350,7 @@ export default function Home() {
                 <PhotographyGallery />
               </TabsContent>
 
-              <TabsContent
-                value="videography"
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4"
-              >
+              <TabsContent value="videography" className="w-full">
                 <VideoGalleryNew />
               </TabsContent>
 
@@ -581,7 +572,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-8 text-center">
-            <p>&copy; 2025 ESproductionz. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} ESproductionz. All rights reserved.</p>
           </div>
         </div>
       </footer>

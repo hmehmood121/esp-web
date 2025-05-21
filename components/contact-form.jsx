@@ -2,16 +2,15 @@
 
 import { useState } from "react"
 import { sendContactEmail } from "@/app/actions/send-email"
-import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -22,27 +21,15 @@ export function ContactForm() {
       const result = await sendContactEmail(formData)
 
       if (result.success) {
-        toast({
-          variant: "success",
-          title: "Success",
-          description: result.message,
-        })
+        toast.success(result.message)
         // Reset the form
         event.target.reset()
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.message,
-        })
+        toast.error(result.message)
       }
     } catch (error) {
       console.error("Error submitting form:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      })
+      toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
