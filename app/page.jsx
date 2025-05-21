@@ -12,6 +12,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { db } from "@/firebase" // Adjust path based on your setup
 import { collection, getDocs } from "firebase/firestore"
 import { ContactForm } from "@/components/contact-form"
+import { PhotographyGallery } from "@/components/photography-gallery"
+import { VideoGalleryNew } from "@/components/video-gallery-new"
 
 function MobileNav() {
   const [open, setOpen] = useState(false)
@@ -24,8 +26,6 @@ function MobileNav() {
       section.scrollIntoView({ behavior: "smooth" })
     }
   }
-
-
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -117,14 +117,6 @@ export default function Home() {
 
     fetchVideos()
   }, [])
-
-  const handleScroll = () => {
-    const contactSection = document.getElementById("contact");
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen max-w-screen-2xl mx-auto" style={scrollStyle}>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -132,7 +124,7 @@ export default function Home() {
           <div className="mr-4 hidden md:flex">
             <a className="mr-6 flex items-center space-x-4" href="/">
               <Image className="ml-2" src="/eslogo.png" alt="Logo" width={32} height={32} />
-              <span className="hidden font-bold sm:inline-block">ESproductionz Inc.</span>
+              <span className="hidden font-bold sm:inline-block">ESproductionz Co.</span>
             </a>
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <a href="#services" onClick={(e) => scrollToSection(e, "services")}>
@@ -170,33 +162,24 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <section id="hero" className="w-full py-8 md:py-16 lg:py-24 xl:py-32 relative">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/saint2.jpg"
-              alt="Background"
-              layout="fill"
-              objectFit="cover"
-              className="opacity-25"
-            />
-          </div>
-          <div className="container px-4 md:px-6 max-w-screen-xl mx-auto relative z-10">
+        <section id="hero" className="w-full py-8 md:py-16 lg:py-24 xl:py-32">
+          <div className="container px-4 md:px-6 max-w-screen-xl mx-auto">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-black">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Bringing Your Vision to Life
                 </h1>
-                <p className="mx-auto max-w-[700px] text-black md:text-xl">
-                  We specialize in Photography, Videography, audio production, Web and Mobile app development.
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                  We specialize in photography, videography, audio production, web and mobile app development.
                 </p>
               </div>
               <div className="space-x-4 pt-4">
-                <Button onClick={handleScroll}>Get Started</Button>
+                <Button>Get Started</Button>
               </div>
             </div>
           </div>
         </section>
-        <section id="about" className="w-full py-12 md:py-24 lg:py-32 bg-gray-200 dark:bg-gray-800">
+        <section id="about" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container px-4 md:px-6 max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
@@ -214,7 +197,7 @@ export default function Home() {
                 {/* <Button>Learn More</Button> */}
               </div>
               <div className="relative h-[400px] rounded-lg overflow-hidden">
-                <Image src="/saint.jpg" alt="About Us" layout="fill" objectFit="cover" />
+                <Image src="/placeholder.svg" alt="About Us" layout="fill" objectFit="cover" />
               </div>
             </div>
           </div>
@@ -294,7 +277,7 @@ export default function Home() {
                 <div className="mt-6">
                   <p className="text-gray-500 dark:text-gray-400">
                     Ernell Sextius is a visionary leader with over 15 years of experience in the multimedia industry. He
-                    founded ESproductionz Co. with the goal of bridging the gap between cutting-edge technology and
+                    founded MultiMedia Co. with the goal of bridging the gap between cutting-edge technology and
                     creative expression. Under her guidance, our company has grown to become a leading force in
                     photography, videography, audio production, and digital development.
                   </p>
@@ -369,45 +352,15 @@ export default function Home() {
                 <TabsTrigger value="development">Development</TabsTrigger>
               </TabsList>
 
-              <TabsContent
-                value="photography"
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-              >
-                {photographyImages.map((url, i) => (
-                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
-                    <Image
-                      src={url || "/placeholder.svg"}
-                      alt={`Photography ${i + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                ))}
+              <TabsContent value="photography" className="w-full">
+                <PhotographyGallery />
               </TabsContent>
 
               <TabsContent
                 value="videography"
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                {videos.length > 0 ? (
-                  videos.map((videoUrl, i) => {
-                    const videoId = videoUrl.split("v=")[1] || videoUrl.split("youtu.be/")[1]
-                    const embedUrl = `https://www.youtube.com/embed/${videoId?.split("?")[0]}`
-
-                    return (
-                      <div key={i} className="relative aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          src={embedUrl}
-                          title={`YouTube video ${i + 1}`}
-                          allowFullScreen
-                          className="w-full h-full"
-                        />
-                      </div>
-                    )
-                  })
-                ) : (
-                  <p className="text-center text-gray-500 col-span-full">Loading videos...</p>
-                )}
+                <VideoGalleryNew />
               </TabsContent>
 
               <TabsContent
@@ -553,9 +506,8 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <a
-                    href="https://play.google.com/store/apps/details?id=com.esproductionzz.esproductionzz&pli=1"
+                    href="#"
                     className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-secondary text-secondary-foreground hover:bg-secondary/80 h-11 px-8"
-                    target="_blank"
                   >
                     <svg viewBox="0 0 24 24" className="w-5 h-5 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg">
                       <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.25 17.292l-4.5-4.364 1.857-1.858 2.643 2.506 5.643-5.784 1.857 1.857-7.5 7.643z" />
@@ -574,7 +526,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="relative h-[400px] rounded-lg overflow-hidden">
-                <Image src="/movie.jpg" alt="Mobile App Preview" layout="fill" objectFit="cover" />
+                <Image src="/placeholder.svg" alt="Mobile App Preview" layout="fill" objectFit="cover" />
               </div>
             </div>
           </div>
@@ -636,4 +588,3 @@ export default function Home() {
     </div>
   )
 }
-

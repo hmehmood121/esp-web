@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react"
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { addDoc, collection, getDocs, deleteDoc, doc } from "firebase/firestore"
-import { Loader2, Upload, Video, Trash2 } from "lucide-react"
+import { Loader2, Upload, Video, Trash2, Play } from "lucide-react"
 import { db } from "@/firebase"
+import { toast } from "sonner"
+import { v4 as uuidv4 } from "uuid"
+import { generateVideoThumbnail } from "@/lib/generate-thumbnail"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Dialog,
   DialogContent,
@@ -20,12 +22,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { toast } from "sonner"
 
 export default function GalleryUpload() {
   const [category, setCategory] = useState("")
   const [images, setImages] = useState([])
-  const [videoUrl, setVideoUrl] = useState("")
+  const [videoFile, setVideoFile] = useState(null)
+  const [videoPreview, setVideoPreview] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrls, setPreviewUrls] = useState([])
   const [galleryImages, setGalleryImages] = useState({})
@@ -57,7 +59,7 @@ export default function GalleryUpload() {
       setGalleryImages(groupedImages)
 
       // Fetch videos
-      const videosSnapshot = await getDocs(collection(db, "portfolio"))
+      const videosSnapshot = await getDocs(collection(db, "videos"))
       const videosData = videosSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -80,12 +82,20 @@ export default function GalleryUpload() {
     setPreviewUrls(urls)
   }
 
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setVideoFile(file)
+      setVideoPreview(URL.createObjectURL(file))
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsUploading(true)
 
     if (!category || images.length === 0) {
-      toast.error("Please enter a category name and select images")
+      toast.error( "Please enter a category name and select images")
       setIsUploading(false)
       return
     }
@@ -125,17 +135,56 @@ export default function GalleryUpload() {
     e.preventDefault()
     setIsUploading(true)
 
+    if (!videoFile) {
+      toast.error("Please select a video file to upload")
+      setIsUploading(false)
+      return
+    }
+
     try {
-      await addDoc(collection(db, "portfolio"), {
-        portfolio: videoUrl,
+      const storage = getStorage()
+      const videoId = uuidv4()
+      const videoRef = ref(storage, `videos/${videoId}-${videoFile.name}`)
+
+      // Upload video file
+      await uploadBytes(videoRef, videoFile)
+      const videoUrl = await getDownloadURL(videoRef)
+
+      // Generate thumbnail
+      let thumbnailUrl = "/placeholder.svg"
+      try {
+        const thumbnailDataUrl = await generateVideoThumbnail(videoFile)
+
+        // Convert data URL to blob
+        const response = await fetch(thumbnailDataUrl)
+        const blob = await response.blob()
+
+        // Upload thumbnail to storage
+        const thumbnailRef = ref(storage, `videos/thumbnails/${videoId}-thumbnail.jpg`)
+        await uploadBytes(thumbnailRef, blob)
+        thumbnailUrl = await getDownloadURL(thumbnailRef)
+      } catch (thumbnailError) {
+        console.error("Error generating thumbnail:", thumbnailError)
+        // Continue with placeholder thumbnail
+      }
+
+      // Add to Firestore
+      await addDoc(collection(db, "videos"), {
+        videoUrl,
+        thumbnailUrl,
+        fileName: videoFile.name,
+        storagePath: videoRef.fullPath,
         timestamp: new Date().toISOString(),
       })
-      toast.success("Video link added successfully")
-      setVideoUrl("")
+
+      toast.success("Video uploaded successfully!")
+
+      setVideoFile(null)
+      setVideoPreview(null)
       fetchGalleryItems()
     } catch (error) {
-      console.error("Error adding video:", error)
-      toast.error("Error adding video. Please try again.")
+      console.error("Error uploading video:", error)
+      toast.error("Error uploading video. Please try again.")
     } finally {
       setIsUploading(false)
     }
@@ -155,14 +204,23 @@ export default function GalleryUpload() {
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting image:", error)
-      toast.error( "Error deleting image. Please try again.",)
+      toast.error("Error deleting image. Please try again.")
     }
   }
 
-  const deleteVideo = async (videoId) => {
+  const deleteVideo = async (videoId, storagePath) => {
     try {
-      await deleteDoc(doc(db, "portfolio", videoId))
-      toast.success("Video link deleted successfully")
+      // Delete from Firestore
+      await deleteDoc(doc(db, "videos", videoId))
+
+      // Delete from Storage if path exists
+      if (storagePath) {
+        const storage = getStorage()
+        const videoRef = ref(storage, storagePath)
+        await deleteObject(videoRef)
+      }
+
+      toast.success("Video deleted successfully")
       fetchGalleryItems()
     } catch (error) {
       console.error("Error deleting video:", error)
@@ -308,33 +366,44 @@ export default function GalleryUpload() {
             {/* Upload Form */}
             <Card>
               <CardHeader>
-                <CardTitle>Add Video Link</CardTitle>
-                <CardDescription>Add YouTube or other video platform links</CardDescription>
+                <CardTitle>Upload Video</CardTitle>
+                <CardDescription>Upload video files (MP4, WebM, etc.)</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={uploadVideo} className="space-y-4">
                   <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="video-url">Video URL</Label>
+                    <Label htmlFor="video-file">Video File</Label>
                     <Input
-                      id="video-url"
-                      type="url"
-                      placeholder="https://youtube.com/..."
-                      value={videoUrl}
-                      onChange={(e) => setVideoUrl(e.target.value)}
+                      id="video-file"
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoChange}
                       required
                       className="border-2"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={!videoUrl || isUploading}>
+
+                  {videoPreview && (
+                    <div className="space-y-2">
+                      <Label>Video Preview</Label>
+                      <div className="aspect-video w-full rounded-lg overflow-hidden border-2">
+                        <video src={videoPreview} controls className="w-full h-full">
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={!videoFile || isUploading}>
                     {isUploading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Adding...
+                        Uploading...
                       </>
                     ) : (
                       <>
                         <Video className="mr-2 h-4 w-4" />
-                        Add Video
+                        Upload Video
                       </>
                     )}
                   </Button>
@@ -345,32 +414,59 @@ export default function GalleryUpload() {
             {/* Display Videos */}
             <Card>
               <CardHeader>
-                <CardTitle>Video Links</CardTitle>
-                <CardDescription>Manage your video links</CardDescription>
+                <CardTitle>Videos</CardTitle>
+                <CardDescription>Manage your videos</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                  <div className="space-y-4">
-                    {galleryVideos.map((video) => (
-                      <div key={video.id} className="flex items-center justify-between p-4 rounded-lg border">
-                        <div className="flex items-center space-x-4">
-                          <Video className="h-6 w-6" />
-                          <a
-                            href={video.portfolio}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            {video.portfolio}
-                          </a>
-                        </div>
-                        <Button variant="destructive" size="icon" onClick={() => deleteVideo(video.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {galleryVideos.map((video) => (
+                    <div key={video.id} className="relative group">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition relative">
+                            {/* Thumbnail or placeholder */}
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                              <Play className="h-12 w-12 text-white" />
+                            </div>
+                            <img
+                              src={video.thumbnailUrl || "/placeholder.svg"}
+                              alt={video.fileName || "Video"}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl">
+                          <DialogHeader>
+                            <DialogTitle>{video.fileName || "Video"}</DialogTitle>
+                            <DialogDescription>
+                              Uploaded on {new Date(video.timestamp).toLocaleDateString()}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="aspect-video w-full">
+                            <video src={video.videoUrl} controls className="w-full h-full">
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition"
+                        onClick={() => deleteVideo(video.id, video.storagePath)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {galleryVideos.length === 0 && (
+                  <div className="text-center py-8">
+                    <Video className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                    <p className="mt-2 text-muted-foreground">No videos uploaded yet</p>
                   </div>
-                </ScrollArea>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -379,4 +475,3 @@ export default function GalleryUpload() {
     </div>
   )
 }
-
