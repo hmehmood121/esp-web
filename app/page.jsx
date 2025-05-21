@@ -197,7 +197,7 @@ export default function Home() {
                 {/* <Button>Learn More</Button> */}
               </div>
               <div className="relative h-[400px] rounded-lg overflow-hidden">
-                <Image src="/placeholder.svg" alt="About Us" layout="fill" objectFit="cover" />
+                <Image src="/saint.jpg" alt="About Us" layout="fill" objectFit="cover" />
               </div>
             </div>
           </div>
@@ -526,7 +526,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="relative h-[400px] rounded-lg overflow-hidden">
-                <Image src="/placeholder.svg" alt="Mobile App Preview" layout="fill" objectFit="cover" />
+                <Image src="/movie.jpg" alt="Mobile App Preview" layout="fill" objectFit="cover" />
               </div>
             </div>
           </div>
